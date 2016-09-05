@@ -1,27 +1,88 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+
+  <style>
+   table {
+       border-collapse: collapse;
+   }
+
+   table, td, th {
+       border: 1px solid black;
+       font-size:90%;        
+   }
+   </style>
+</head>
+
+
+<body>
+
 <?php
 
-header('Content-type: text/plain; charset=UTF-8'); 
+$mysqli = new mysqli('localhost', 'root', 'mysql', 'hellowork');
 
-$link = mysqli_connect('localhost', 'root', 'mysql', 'hellowork');
-
-mysqli_set_charset($link, 'utf8');
-
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());  
+if ($mysqli->connect_error) {
+    die($mysqli->connect_error);  
+} else {
+    $mysqli->set_charset('utf8');
 }
 
-$sql = 'SELECT a.uuid, a.title, b.detail FROM jobsearch as a, jobdetails as b where a.uuid=b.uuid order by a.us_date desc';
+echo "<table>";
 
-if ($result = mysqli_query($link, $sql)) {
+  $sql = 'SELECT a.us_date, a.uuid, a.url, a.title, a.salarylow, a.salaryhigh, b.detail, b.number, b.number_local, a.salarystatus, a.location FROM jobsearch as a, jobdetails as b where a.uuid=b.uuid order by a.us_date desc';
+
+
+if ($result = $mysqli->query($sql)) {   
+
+    $cnt = 0;
+    while ($row = $result->fetch_array(MYSQLI_NUM)) {
+        echo "<tr>";
+        echo "<td>";
+        echo ++$cnt;
+        echo "</td>";
+        echo "<td>";
+        echo "<a href='" . $row[2] . "'>" . $row[1] . "</a>";
+        echo "</td>";
+        echo "<td>";
+        echo $row[3] . "\n";
+        echo "</td>";
+        echo "<td>" . $row[4] . "</td>";
+        echo "<td>" . $row[5] . "</td>";
+        echo "</tr>";
+
+	echo "<tr>";
+        echo "<td>";
+        echo "</td><td></td>";
+        echo "<td colspan=\"3\">";
+        echo $row[6];
+        echo "</td>";
+	echo "</tr>";
+
+        echo "<tr>";
+        echo "<td>";
+        echo $row[0];
+        echo "</td>";
+        echo "<td>";
+        echo $row[8] . "\n";
+        echo "</td>";
+        echo "<td>";
+        echo $row[7] . "\n";
+        echo "</td>";
+        echo "<td>" . $row[9] . "</td>";
+        echo "<td>" . $row[10] . "</td>";
+        echo "</tr>"; 
+
+   }
  
-    while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
-        echo $row[0] . "\n";
-        echo $row[1] . "\n";
-        echo $row[2] . "\n";
-    }
- 
-    mysqli_free_result($result);
+      $result->close();
 }
  
-mysqli_close($link);
+echo "</table>";
+
+$mysqli->close();
 ?>
+
+
+</body>
+</html>
